@@ -45,7 +45,7 @@ router.post('/setup', function(req, res) {
 	    //console.log('User: '+ req.body.name+' saved successfully');
 	    res.json(response);
 	  };
-	  api.createUser(req.body, app, _cb);
+	  api.createUser(req.body, _cb);
 	 // });
 	});
 
@@ -55,12 +55,14 @@ router.post('/authenticate', function(req, res) {
 	//console.log("authenticate server.js name: "+req.body.name);
 	//console.log("authenticate server.js password: "+req.body.password);
 	//console.log("authenticate server.js admin: "+req.body.admin);
-	 
+	var secret;
+	if(req.body.admin){ secret = app.get('superSecret_admin');}else{secret = app.get('superSecret_client');}
+	
 	var _cb = function(response){
 	//console.log("response recieved by server.js " + JSON.stringify(response));
 	res.json(response);
 	};
-	api.authenticateUser(req.body, app,_cb);
+	api.authenticateUser(req.body, secret, _cb);
 	});
 
 //middleware to use for all requests while authenticated

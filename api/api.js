@@ -10,7 +10,7 @@ var config = require('./config'); // get our config file
 
 module.exports= { 		
 
-"createUser" : function (body, app, callback){
+"createUser" : function (body, callback){
 var d = new Date();
 var now = d.getUTCFullYear()+ "-"+d.getUTCMonth()+"-"+d.getUTCDay();
 // create a sample user
@@ -37,7 +37,7 @@ user.save(function(err,_id) {
 	var response = { success: true };
 	callback(response);
 },
-"authenticateUser" : function (body, app, callback){
+"authenticateUser" : function (body, secret, callback){
 console.log("authenticate user has fired");
 console.log("authenticate user name: "+body.name);
 // find the user
@@ -63,7 +63,7 @@ User.findOne({
 	    	// If is admin 
 	  	    // if user is found and password is right
 	  	    // create a token
-	  	    var token = jwt.sign(user, app.get('superSecret_admin'), {
+	  	    var token = jwt.sign(user, secret, {
 	  	    expiresInMinutes: 1440 // expires in 24 hours
 	  	    });
 
