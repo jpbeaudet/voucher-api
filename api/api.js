@@ -11,7 +11,6 @@ var config = require('./config'); // get our config file
 module.exports= { 		
 
 "createUser" : function (body, app, callback){
-
 var d = new Date();
 var now = d.getUTCFullYear()+ "-"+d.getUTCMonth()+"-"+d.getUTCDay();
 // create a sample user
@@ -39,14 +38,14 @@ user.save(function(err,_id) {
 	callback(response);
 },
 "authenticateUser" : function (body, app, callback){
-	console.log("authenticate user has fired");
-	console.log("authenticate user name: "+body.name);
-	  // find the user
-	  User.findOne({
-	    name: body.name
-	  }, function(err, user) {
-		  console.log("found user has fired");
-	    if (err) throw err;
+console.log("authenticate user has fired");
+console.log("authenticate user name: "+body.name);
+// find the user
+User.findOne({
+	name: body.name
+	}, function(err, user) {
+	console.log("found user has fired");
+		if (err) throw err;
 
 	    if (!user) {
 	    	response = { success: false, message: 'Authentication failed. Wrong password.' };
@@ -55,28 +54,28 @@ user.save(function(err,_id) {
 	    } else if (user) {
 
 	      // check if password matches
-	      if (user.password != body.password) {
+	    if (user.password != body.password) {
 	    	response = { success: false, message: 'Authentication failed. Wrong password.' };
 	    	callback(response);
 	        // res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-	      } else {
-	    	  if(body.admin ){
-	    		  // If is admin 
-	  	        // if user is found and password is right
-	  	        // create a token
-	  	        var token = jwt.sign(user, app.get('superSecret_admin'), {
-	  	          expiresInMinutes: 1440 // expires in 24 hours
-	  	        });
+	    } else {
+	    if(body.admin ){
+	    	// If is admin 
+	  	    // if user is found and password is right
+	  	    // create a token
+	  	    var token = jwt.sign(user, app.get('superSecret_admin'), {
+	  	    expiresInMinutes: 1440 // expires in 24 hours
+	  	    });
 
-	  	        // return the information including token as JSON
-	  	        response = {
-	  	          success: true,
-	  	          message: 'Enjoy your token!',
-	  	          token: token
+	  	    // return the information including token as JSON
+	  	    response = {
+	  	       success: true,
+	  	        message: 'Enjoy your token!',
+	  	        token: token
 	  	        };
-	  	      callback (response);
-	    	  }else{
-	    		  // If is client 
+	  	    callback (response);
+	    }else{
+	    	// If is client 
 	        // if user is found and password is right
 	        // create a token
 	        var token = jwt.sign(user, app.get('superSecret_client'), {
@@ -91,11 +90,7 @@ user.save(function(err,_id) {
 	        };
 	        console.log("response has fired"+ JSON.stringify(response));
 	        callback(response);
-	      }
-	      }   
-
-	    }
-
+	      }}}
 	  });	
 }
 };
