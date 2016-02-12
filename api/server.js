@@ -40,31 +40,9 @@ var router = express.Router();              // get an instance of the express Ro
 
 // Middleware before authentification
 router.post('/setup', function(req, res) {
-	console.log("setup server.js body: "+JSON.stringify(req.body));	
-	  //var d = new Date();
-	  // create a sample user
-	  //var user = new User({ 
-	    //name: req.body.name, 
-	    //password: req.body.password,
-	    //admin: req.body.admin 
-	  //});
-
-	  // save the sample user
-	  //user.save(function(err,_id) {
-	    //if (err) throw err;
-
-		// create a matrix instance to the user.id
-		//var matrix = new Matrix({
-			//name: { type: req.body.name, trim: true },
-			//user_id: _id,
-			//created: d.now()		  
-			//});			  
-		    //matrix.save(function(err,_id) {
-			//    if (err) throw err;
-		  	//});
-	
+	  //console.log("setup server.js body: "+JSON.stringify(req.body));		
 	  var _cb = function(response){ 
-	    console.log('User: '+ req.body.name+' saved successfully');
+	    //console.log('User: '+ req.body.name+' saved successfully');
 	    res.json(response);
 	  };
 	  api.createUser(req.body, app, _cb);
@@ -73,65 +51,15 @@ router.post('/setup', function(req, res) {
 
 
 router.post('/authenticate', function(req, res) {
-	console.log("authenticate server.js body: "+JSON.stringify(req.body));
-	//var body = req.body;
-	console.log("authenticate server.js name: "+req.body.name);
-	console.log("authenticate server.js password: "+req.body.password);
-	console.log("authenticate server.js admin: "+req.body.admin);
-	  // find the user
-	  //User.findOne({
-	    //name: req.body.name
-	  //}, function(err, user) {
-
-	    //if (err) throw err;
-
-	    //if (!user) {
-	      //res.json({ success: false, message: 'Authentication failed. User not found.' });
-	    //} else if (user) {
-
-	      // check if password matches
-	      //if (user.password != req.body.password) {
-	        //res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-	      //} else {
-	    	  //if(req.body.admin ){
-	    		  // If is admin 
-	  	        // if user is found and password is right
-	  	        // create a token
-	  	        //var token = jwt.sign(user, app.get('superSecret_admin'), {
-	  	          //expiresInMinutes: 1440 // expires in 24 hours
-	  	        //});
-
-	  	        // return the information including token as JSON
-	  	        //res.json({
-	  	          //success: true,
-	  	          //message: 'Enjoy your token!',
-	  	          //token: token
-	  	        //});		  
-	    	 // }else{
-	    		  // If is client 
-	        // if user is found and password is right
-	        // create a token
-	        //var token = jwt.sign(user, app.get('superSecret_client'), {
-	          //expiresInMinutes: 1440 // expires in 24 hours
-	        //});
-
-	        // return the information including token as JSON
-	        //res.json({
-	          //success: true,
-	          //message: 'Enjoy your token!',
-	          //token: token
-	       // });
-	      //}
-	      //}   
-
-	    //}
-
-	  //});
-
+	//console.log("authenticate server.js body: "+JSON.stringify(req.body));
+	//console.log("authenticate server.js name: "+req.body.name);
+	//console.log("authenticate server.js password: "+req.body.password);
+	//console.log("authenticate server.js admin: "+req.body.admin);
+	 
 	var _cb = function(response){
-	console.log("response recieved by server.js " + JSON.stringify(response))
+	//console.log("response recieved by server.js " + JSON.stringify(response));
 	res.json(response);
-	}
+	};
 	api.authenticateUser(req.body, app,_cb);
 	});
 
