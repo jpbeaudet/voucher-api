@@ -27,8 +27,8 @@ user.save(function(err,_id) {
 	 
 	// create a matrix instance to the user.id
 	var matrix = new Matrix({
-		name: { type: body.name, trim: true },
-		user_id: _id,
+		name: body.name,
+		user_id: _id._id,
 		created: now		  
 		});			  
 		matrix.save(function(err,_id) {
