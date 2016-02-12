@@ -12,7 +12,9 @@ var bodyParser = require('body-parser');
 var morgan      = require('morgan');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
-var User   = require('./app/models/user'); // get our mongoose model
+var User   = require('./app/models/user'); // get our mongoose user model
+var Matrix   = require('./app/models/matrix'); // get our mongoose matrix model
+var api   = require('./api'); // get our api method library
 //TODO : connect to private db
 
 // configure app to use bodyParser()
@@ -38,75 +40,99 @@ var router = express.Router();              // get an instance of the express Ro
 
 // Middleware before authentification
 router.post('/setup', function(req, res) {
-
+	console.log("setup server.js body: "+JSON.stringify(req.body));	
+	  //var d = new Date();
 	  // create a sample user
-	  var user = new User({ 
-	    name: req.body.name, 
-	    password: req.body.password,
-	    admin: req.body.admin 
-	  });
+	  //var user = new User({ 
+	    //name: req.body.name, 
+	    //password: req.body.password,
+	    //admin: req.body.admin 
+	  //});
 
 	  // save the sample user
-	  user.save(function(err) {
-	    if (err) throw err;
+	  //user.save(function(err,_id) {
+	    //if (err) throw err;
 
+		// create a matrix instance to the user.id
+		//var matrix = new Matrix({
+			//name: { type: req.body.name, trim: true },
+			//user_id: _id,
+			//created: d.now()		  
+			//});			  
+		    //matrix.save(function(err,_id) {
+			//    if (err) throw err;
+		  	//});
+	
+	  var _cb = function(response){ 
 	    console.log('User: '+ req.body.name+' saved successfully');
-	    res.json({ success: true });
-	  });
+	    res.json(response);
+	  };
+	  api.createUser(req.body, app, _cb);
+	 // });
 	});
 
 
 router.post('/authenticate', function(req, res) {
-
+	console.log("authenticate server.js body: "+JSON.stringify(req.body));
+	//var body = req.body;
+	console.log("authenticate server.js name: "+req.body.name);
+	console.log("authenticate server.js password: "+req.body.password);
+	console.log("authenticate server.js admin: "+req.body.admin);
 	  // find the user
-	  User.findOne({
-	    name: req.body.name
-	  }, function(err, user) {
+	  //User.findOne({
+	    //name: req.body.name
+	  //}, function(err, user) {
 
-	    if (err) throw err;
+	    //if (err) throw err;
 
-	    if (!user) {
-	      res.json({ success: false, message: 'Authentication failed. User not found.' });
-	    } else if (user) {
+	    //if (!user) {
+	      //res.json({ success: false, message: 'Authentication failed. User not found.' });
+	    //} else if (user) {
 
 	      // check if password matches
-	      if (user.password != req.body.password) {
-	        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-	      } else {
-	    	  if(req.body.admin ){
+	      //if (user.password != req.body.password) {
+	        //res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+	      //} else {
+	    	  //if(req.body.admin ){
 	    		  // If is admin 
 	  	        // if user is found and password is right
 	  	        // create a token
-	  	        var token = jwt.sign(user, app.get('superSecret_admin'), {
-	  	          expiresInMinutes: 1440 // expires in 24 hours
-	  	        });
+	  	        //var token = jwt.sign(user, app.get('superSecret_admin'), {
+	  	          //expiresInMinutes: 1440 // expires in 24 hours
+	  	        //});
 
 	  	        // return the information including token as JSON
-	  	        res.json({
-	  	          success: true,
-	  	          message: 'Enjoy your token!',
-	  	          token: token
-	  	        });		  
-	    	  }else{
+	  	        //res.json({
+	  	          //success: true,
+	  	          //message: 'Enjoy your token!',
+	  	          //token: token
+	  	        //});		  
+	    	 // }else{
 	    		  // If is client 
 	        // if user is found and password is right
 	        // create a token
-	        var token = jwt.sign(user, app.get('superSecret_client'), {
-	          expiresInMinutes: 1440 // expires in 24 hours
-	        });
+	        //var token = jwt.sign(user, app.get('superSecret_client'), {
+	          //expiresInMinutes: 1440 // expires in 24 hours
+	        //});
 
 	        // return the information including token as JSON
-	        res.json({
-	          success: true,
-	          message: 'Enjoy your token!',
-	          token: token
-	        });
-	      }
-	      }   
+	        //res.json({
+	          //success: true,
+	          //message: 'Enjoy your token!',
+	          //token: token
+	       // });
+	      //}
+	      //}   
 
-	    }
+	    //}
 
-	  });
+	  //});
+
+	var _cb = function(response){
+	console.log("response recieved by server.js " + JSON.stringify(response))
+	res.json(response);
+	}
+	api.authenticateUser(req.body, app,_cb);
 	});
 
 //middleware to use for all requests while authenticated
@@ -119,7 +145,7 @@ router.use(function(req, res, next) {
 	  if (token) {
 
 	    // verifies secret and checks exp
-	    jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
+	    jwt.verify(token, app.get('superSecret_client'), function(err, decoded) {      
 	      if (err) {
 	        return res.json({ success: false, message: 'Failed to authenticate token.' });    
 	      } else {
