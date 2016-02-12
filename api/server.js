@@ -23,7 +23,8 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 4006;        // set our port
 var mongoose   = require('mongoose');
 mongoose.connect(config.database); // database
-app.set('superSecret', config.secret); // secret variable
+app.set('superSecret_client', config.secret_client); // secret variable
+app.set('superSecret_admin', config.secret_admin); // secret variable
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -72,10 +73,25 @@ router.post('/authenticate', function(req, res) {
 	      if (user.password != req.body.password) {
 	        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
 	      } else {
+	    	  if(req.body.admin ){
+	    		  // If is admin 
+	  	        // if user is found and password is right
+	  	        // create a token
+	  	        var token = jwt.sign(user, app.get('superSecret_admin'), {
+	  	          expiresInMinutes: 1440 // expires in 24 hours
+	  	        });
 
+	  	        // return the information including token as JSON
+	  	        res.json({
+	  	          success: true,
+	  	          message: 'Enjoy your token!',
+	  	          token: token
+	  	        });		  
+	    	  }else{
+	    		  // If is client 
 	        // if user is found and password is right
 	        // create a token
-	        var token = jwt.sign(user, app.get('superSecret'), {
+	        var token = jwt.sign(user, app.get('superSecret_client'), {
 	          expiresInMinutes: 1440 // expires in 24 hours
 	        });
 
@@ -85,6 +101,7 @@ router.post('/authenticate', function(req, res) {
 	          message: 'Enjoy your token!',
 	          token: token
 	        });
+	      }
 	      }   
 
 	    }
