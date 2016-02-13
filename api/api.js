@@ -39,15 +39,21 @@ module.exports= {
 		user.circles.my_voucher = newVoucher;
 		user.save(function(err, _id) {
 			if (err){callback(err, response);}
-			response = { success:true , message: "user myVoucher circle successfully updated", myVoucher: _id};
+			response = { success:true , message: "user myVoucher circle successfully updated", user: _id};
 			callback(response);
 			});
 
 		});	
 	}else{
 		console.log(" No new voucher to update for: " + userId); 
-		response = {success:false, message:" No new voucher to update for: " + userId};
+		Matrix.findOne({
+			user_id : userId
+		},function(err, user) {		
+		response = { success:false , message: " No new voucher to update for: " + userId, user: user};
 		callback(response);
+		});			
+
+		
 	}		
 });		
 },
