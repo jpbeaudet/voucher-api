@@ -78,7 +78,7 @@ User.findOne({
 	    	// If is client 
 	        // if user is found and password is right
 	        // create a token
-	        var token = jwt.sign(user, app.get('superSecret_client'), {
+	        var token = jwt.sign(user, secret, {
 	          expiresInMinutes: 1440 // expires in 24 hours
 	        });
 

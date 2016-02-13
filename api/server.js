@@ -18,7 +18,6 @@ var api   = require('./api'); // get our api method library
 //TODO : connect to private db
 
 // configure app to use bodyParser()
-// this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -34,11 +33,15 @@ db.once('open', function callback () {
 });
 
 
-//ROUTES FOR OUR API
+//ROUTES FOR VOUCHER-API
 //=============================================================================
 var router = express.Router();              // get an instance of the express Router
 
-// Middleware before authentification
+// Voucher api CRUD sections
+/////////////////////////////////////////
+//Create section
+
+// Middleware to create a new user
 router.post('/setup', function(req, res) {
 	  //console.log("setup server.js body: "+JSON.stringify(req.body));		
 	  var _cb = function(response){ 
@@ -49,6 +52,8 @@ router.post('/setup', function(req, res) {
 	 // });
 	});
 
+/////////////////////////////////////////
+//Authenticate section
 
 router.post('/authenticate', function(req, res) {
 	//console.log("authenticate server.js body: "+JSON.stringify(req.body));
@@ -97,14 +102,18 @@ router.use(function(req, res, next) {
 	  }
 	});
 
-//test route to make sure everything is working (accessed at GET http://localhost:8080/api)
+// While authenticated:
+/////////////////////////////////////////
+// Read section
+
+//test route to make sure everything is working (accessed at GET http://localhost:4006/api)
 router.get('/', function(req, res) {
- res.json({ message: 'hooray! welcome to our api!' });   
+ res.json({ message: 'Voucher API!' });   
 });
 
 
 router.route('/users') 
-//get all the users (accessed at GET http://localhost:8080/api/users)
+//get all the users (accessed at GET http://localhost:4006/api/users)
 	.get(function(req, res) {
 		User.find(function(err, users) {
 			if (err)
@@ -115,7 +124,7 @@ router.route('/users')
 
 router.route('/users/:users_id')
 
-// get the user with that id (accessed at GET http://localhost:8080/api/bears/:users_id)
+// get the user with that id (accessed at GET http://localhost:4006/api/:users_id)
 .get(function(req, res) {
     User.findById(req.params.users_id, function(err, user) {
         if (err)
@@ -123,6 +132,53 @@ router.route('/users/:users_id')
         res.json(user);
     });
 });
+
+router.route('/users/:users_id/circles')
+
+//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+.get(function(req, res) {
+	Matrix.findOne({
+		user_id: req.params.users_id
+		}, function(err, matrix) {
+     res.json(matrix);
+ });
+});
+
+router.route('/users/:users_id/circles/first')
+
+//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+.get(function(req, res) {
+	Matrix.findOne({
+		user_id: req.params.users_id
+		}, function(err, matrix) {
+   res.json(matrix.circles.first_circle);
+});
+});
+
+router.route('/users/:users_id/circles/second')
+
+//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+.get(function(req, res) {
+	Matrix.findOne({
+		user_id: req.params.users_id
+		}, function(err, matrix) {
+ res.json(matrix.circles.second_circle);
+});
+});
+
+router.route('/users/:users_id/circles/third')
+
+//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+.get(function(req, res) {
+	Matrix.findOne({
+		user_id: req.params.users_id
+		}, function(err, matrix) {
+res.json(matrix.circles.third_circle);
+});
+});
+
+/////////////////////////////////////////
+//Update section
 
 router.route('/users/:users_id')
 .put(function(req, res) {
@@ -136,7 +192,7 @@ router.route('/users/:users_id')
         user.name = req.body.name;  // update the user name
         user.password = req.body.password;  // update the user password
         user.admin = req.body.admin;  // update the user admin
-        // save the bear
+        // save the user
         user.save(function(err) {
             if (err)
                 res.send(err);
@@ -147,6 +203,42 @@ router.route('/users/:users_id')
     });
 });
 
+router.route('/users/:users_id/circles/:voucher_id')
+.put(function(req, res) {
+
+	Matrix.findOne({
+		user_id: req.params.users_id
+		
+		}, function(err, matrix) {
+			console.log("put did find "+matrix);
+			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
+			var arr = [];
+			var arr_before = matrix.circles.first_circle.voucher
+			for (i = 0; i < arr_before.length; i++) { 
+				arr.push(arr_before[i]);
+			}			
+			//arr.push(matrix.circles.first_circle.voucher);
+			console.log("put arr[0]  "+arr[0]);
+			arr.push(req.params.voucher_id);
+			console.log("put arr[1]  "+arr[1]);
+			matrix.circles.first_circle.voucher = undefined;
+			matrix.save(function(err) {			
+				//console.log("put arr"+arr);			
+				matrix.circles.first_circle.voucher = arr;		
+				matrix.save(function(err) {
+					if (err)
+						res.send(err);
+	           
+					res.json({ success:true , message: 'Voucher updated! New voucher added : ' +req.params.voucher_id});
+			});
+				});
+    });
+
+});
+
+/////////////////////////////////////////
+//Delete section
+
 router.route('/users/:users_id')
 .delete(function(req, res) {
     User.remove({
@@ -156,6 +248,49 @@ router.route('/users/:users_id')
             res.send(err);
 
         res.json({ success:true, message: 'User: '+ user+' Successfully deleted' });
+    });
+});
+
+router.route('/users/:users_id/circles/:voucher_id')
+.delete(function(req, res) {
+	console.log("delete did fired !!! ");
+	var massage="No messages. id was : ";
+	Matrix.findOne({
+		user_id: req.params.users_id
+		
+		}, function(err, matrix) {
+			console.log("delete did find "+matrix);
+			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
+			var arr = [];
+			//arr.push(matrix.circles.first_circle.voucher);
+			var arr_before = matrix.circles.first_circle.voucher
+			for (i = 0; i < arr_before.length; i++) { 
+				arr.push(arr_before[i]);
+			}	
+			matrix.circles.first_circle.voucher = undefined;
+			matrix.save(function(err) {			
+				console.log("delete arr before "+arr);
+				console.log("delete req.params.voucher_id "+req.params.voucher_id);	
+				var index = arr.indexOf(req.params.voucher_id);
+				console.log("delete arr "+arr);
+				console.log("delete arr index "+index);
+				if(index != null && index != undefined){ 
+				
+				arr.splice(index, 1);
+				matrix.circles.first_circle.voucher = arr;
+				message = "Voucher succesfully removed :";
+				}else{
+				matrix.circles.first_circle.voucher = arr;	
+				message = "Voucher did not exist :";
+				}
+				matrix.save(function(err) {
+					console.log("delete arr after "+arr);
+					if (err)
+						res.send(err);
+	           
+					res.json({ success:true , message: message+ ' : ' +req.params.voucher_id});
+			});
+				});
     });
 });
 
