@@ -45,7 +45,7 @@ var router = express.Router();              // get an instance of the express Ro
 router.post('/setup', function(req, res) {
 	  //console.log("setup server.js body: "+JSON.stringify(req.body));		
 	  var _cb = function(response){ 
-	    //console.log('User: '+ req.body.name+' saved successfully');
+	    console.log('User: '+ req.body.name+' saved successfully');
 	    res.json(response);
 	  };
 	  api.createUser(req.body, _cb);
@@ -72,13 +72,10 @@ router.post('/authenticate', function(req, res) {
 
 //middleware to use for all requests while authenticated
 router.use(function(req, res, next) {
-
 	  // check header or url parameters or post parameters for token
 	  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
 	  // decode token
 	  if (token) {
-
 	    // verifies secret and checks exp
 	    jwt.verify(token, app.get('superSecret_client'), function(err, decoded) {      
 	      if (err) {
@@ -89,7 +86,6 @@ router.use(function(req, res, next) {
 	        next();
 	      }
 	    });
-
 	  } else {
 
 	    // if there is no token
@@ -97,8 +93,7 @@ router.use(function(req, res, next) {
 	    return res.status(403).send({ 
 	        success: false, 
 	        message: 'No token provided.' 
-	    });
-	    
+	    });	    
 	  }
 	});
 
@@ -114,126 +109,85 @@ router.get('/', function(req, res) {
 
 router.route('/users') 
 //get all the users (accessed at GET http://localhost:4006/api/users)
-	.get(function(req, res) {
-		User.find(function(err, users) {
-			if (err)
-				res.send(err);
-				res.json(users);
- });
+.get(function(req, res) {		
+	var _cb = function(err, users){ 
+	console.log('Users returned successfully ');
+	if(err){res.send(err);}else{res.json(users);}		  
+	};
+	api.getUsers(_cb);
 });
 
 router.route('/users/:users_id')
-
-// get the user with that id (accessed at GET http://localhost:4006/api/:users_id)
-.get(function(req, res) {
-    User.findById(req.params.users_id, function(err, user) {
-        if (err)
-            res.send(err);
-        res.json(user);
-    });
+//get the all user data (accessed at GET http://localhost:4006/api/users/:users_id)
+.get(function(req, res) {	
+	var _cb = function(err, users){ 
+	console.log('User returned successfully ');
+	if(err){res.send(err);}else{res.json(users);}		  
+	};
+	api.getUserById(req.params.users_id, _cb);	
 });
 
 router.route('/users/:users_id/circles')
-
-//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+//get the all user circles (accessed at GET http://localhost:4006/api/users/:users_id/circles')
 .get(function(req, res) {
-	Matrix.findOne({
-		user_id: req.params.users_id
-		}, function(err, matrix) {
-     res.json(matrix);
- });
+	var _cb = function(err, matrix){ 
+	console.log('User Circles returned successfully ');
+	if(err){res.send(err);}else{res.json(matrix);}		  
+	};	
+	api.getUserCircles(req.params.users_id, _cb);
 });
 
 router.route('/users/:users_id/circles/first')
-
-//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+//get the user second circle (accessed at GET http://localhost:4006/api/users/:users_id/circles/first')
 .get(function(req, res) {
-	Matrix.findOne({
-		user_id: req.params.users_id
-		}, function(err, matrix) {
-   res.json(matrix.circles.first_circle);
-});
+	var _cb = function(err, matrix){ 
+	console.log('User First Circles returned successfully ');
+	if(err){res.send(err);}else{res.json(matrix);}		  
+	};	
+	api.getUserFirstCircle(req.params.users_id, _cb);	
 });
 
 router.route('/users/:users_id/circles/second')
-
-//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+//get the user second circle (accessed at GET http://localhost:4006/api/users/:users_id/circles/second')
 .get(function(req, res) {
-	Matrix.findOne({
-		user_id: req.params.users_id
-		}, function(err, matrix) {
- res.json(matrix.circles.second_circle);
-});
+	var _cb = function(err, matrix){ 
+	console.log('User Second Circles returned successfully ');
+	if(err){res.send(err);}else{res.json(matrix);}		  
+	};	
+	api.getUserSecondCircle(req.params.users_id, _cb);	
 });
 
 router.route('/users/:users_id/circles/third')
-
-//get the user with that id (accessed at GET http://localhost:4006/api/bears/:users_id)
+//get the user third circle (accessed at GET http://localhost:4006/api/users/:users_id/circles/third')
 .get(function(req, res) {
-	Matrix.findOne({
-		user_id: req.params.users_id
-		}, function(err, matrix) {
-res.json(matrix.circles.third_circle);
-});
+	var _cb = function(err, matrix){ 
+	console.log('User Third Circles returned successfully ');
+	if(err){res.send(err);}else{res.json(matrix);}		  
+	};	
+	api.getUserThirdCircle(req.params.users_id, _cb);		
 });
 
 /////////////////////////////////////////
 //Update section
 
+//update the user(not used) (accessed at PUT http://localhost:4006/api/users/:users_id/')
 router.route('/users/:users_id')
 .put(function(req, res) {
-
-    // use our user model to find the user we want
-    User.findById(req.params.users_id, function(err, user) {
-
-        if (err)
-            res.send(err);
-
-        user.name = req.body.name;  // update the user name
-        user.password = req.body.password;  // update the user password
-        user.admin = req.body.admin;  // update the user admin
-        // save the user
-        user.save(function(err) {
-            if (err)
-                res.send(err);
-
-            res.json({ success:true , message: 'User updated!' });
-        });
-
-    });
+	var _cb = function(err, matrix){ 
+	console.log('User Updated successfully: '+req.params.users_id);
+	if(err){res.send(err);}else{res.json({ success:true , message: 'User updated!' });}		  
+	};	
+	api.updateUserById(req.body, req.params.users_id, _cb);	
 });
 
+//add a voucher to the user first circle (accessed at PUT http://localhost:4006/api/users/:users_id/circles')
 router.route('/users/:users_id/circles/:voucher_id')
 .put(function(req, res) {
-
-	Matrix.findOne({
-		user_id: req.params.users_id
-		
-		}, function(err, matrix) {
-			//console.log("put did find "+matrix);
-			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
-			var arr = [];
-			var arr_before = matrix.circles.first_circle.voucher
-			for (i = 0; i < arr_before.length; i++) { 
-				arr.push(arr_before[i]);
-			}			
-			//arr.push(matrix.circles.first_circle.voucher);
-			//console.log("put arr[0]  "+arr[0]);
-			arr.push(req.params.voucher_id);
-			//console.log("put arr[1]  "+arr[1]);
-			matrix.circles.first_circle.voucher = undefined;
-			matrix.save(function(err) {			
-				//console.log("put arr"+arr);			
-				matrix.circles.first_circle.voucher = arr;		
-				matrix.save(function(err) {
-					if (err)
-						res.send(err);
-	           
-					res.json({ success:true , message: 'Voucher updated! New voucher added : ' +req.params.voucher_id});
-			});
-				});
-    });
-
+	var _cb = function(err, response){ 
+	console.log('User Voucher Updated successfully for : '+req.params.voucher_id);
+	if(err){res.send(err);}else{res.json(response);}		  
+	};	
+	api.updateUserVoucherById(req.params.users_id, req.params.voucher_id, _cb);	
 });
 
 /////////////////////////////////////////
@@ -262,7 +216,6 @@ router.route('/users/:users_id/circles/:voucher_id')
 			//console.log("delete did find "+matrix);
 			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
 			var arr = [];
-			//arr.push(matrix.circles.first_circle.voucher);
 			var arr_before = matrix.circles.first_circle.voucher
 			for (i = 0; i < arr_before.length; i++) { 
 				arr.push(arr_before[i]);
