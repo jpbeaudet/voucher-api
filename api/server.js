@@ -193,58 +193,24 @@ router.route('/users/:users_id/circles/:voucher_id')
 /////////////////////////////////////////
 //Delete section
 
+// delete a user by id  (accessed at DELETE http://localhost:4006/api/users/:users_id')
 router.route('/users/:users_id')
 .delete(function(req, res) {
-    User.remove({
-        _id: req.params.users_id
-    }, function(err, user) {
-        if (err)
-            res.send(err);
-
-        res.json({ success:true, message: 'User: '+ user+' Successfully deleted' });
-    });
+	var _cb = function(err, response){ 
+	console.log('User Deleted successfully for : '+req.params.users_id);
+	if(err){res.send(err);}else{res.json(response);}		  
+	};	
+	api.deleteUserById(req.params.users_id, _cb);	
 });
 
+//delete a voucher in the user list by ids  (accessed at DELETE http://localhost:4006/api/users/:users_id/circles/:voucher_id')
 router.route('/users/:users_id/circles/:voucher_id')
 .delete(function(req, res) {
-	//console.log("delete did fired !!! ");
-	var massage="No messages. id was : ";
-	Matrix.findOne({
-		user_id: req.params.users_id
-		
-		}, function(err, matrix) {
-			//console.log("delete did find "+matrix);
-			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
-			var arr = [];
-			var arr_before = matrix.circles.first_circle.voucher
-			for (i = 0; i < arr_before.length; i++) { 
-				arr.push(arr_before[i]);
-			}	
-			matrix.circles.first_circle.voucher = undefined;
-			matrix.save(function(err) {			
-				//console.log("delete arr before "+arr);
-				//console.log("delete req.params.voucher_id "+req.params.voucher_id);	
-				var index = arr.indexOf(req.params.voucher_id);
-				//console.log("delete arr "+arr);
-				//console.log("delete arr index "+index);
-				if(index != null && index != undefined){ 
-				
-				arr.splice(index, 1);
-				matrix.circles.first_circle.voucher = arr;
-				message = "Voucher succesfully removed :";
-				}else{
-				matrix.circles.first_circle.voucher = arr;	
-				message = "Voucher did not exist :";
-				}
-				matrix.save(function(err) {
-					//console.log("delete arr after "+arr);
-					if (err)
-						res.send(err);
-	           
-					res.json({ success:true , message: message+ ' : ' +req.params.voucher_id});
-			});
-				});
-    });
+	var _cb = function(err, response){ 
+	console.log('User Voucher Deleted successfully for : '+req.params.voucher_id);
+	if(err){res.send(err);}else{res.json(response);}		  
+	};	
+	api.deleteUserVoucherById(req.params.users_id, req.params.voucher_id, _cb);	
 });
 
 //REGISTER OUR ROUTES -------------------------------

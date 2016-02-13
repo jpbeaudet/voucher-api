@@ -9,6 +9,54 @@ var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 
 module.exports= {
+"deleteUserVoucherById" : function(userId,voucherId, callback){
+var response;
+var message="No messages. id was : ";
+Matrix.findOne({
+	user_id: userId	
+	}, function(err, matrix) {
+		//console.log("delete did find "+matrix);
+		var arr = [];
+		try {
+		var arr_before = matrix.circles.first_circle.voucher
+		for (i = 0; i < arr_before.length; i++) { 
+			arr.push(arr_before[i]);
+			}	
+		matrix.circles.first_circle.voucher = undefined;
+		matrix.save(function(err) {				
+		var index = arr.indexOf(voucherId);
+		if(index != null && index != undefined){ 				
+			arr.splice(index, 1);
+			matrix.circles.first_circle.voucher = arr;
+			message = "Voucher succesfully removed :";
+			}else{
+			matrix.circles.first_circle.voucher = arr;	
+			message = "Voucher did not exist :";
+			}
+		matrix.save(function(err) {
+			//console.log("delete arr after "+arr);
+			if (err){callback(err, response);}
+			response = { success:true , message: message+ ' : ' +voucherId};
+			callback(response);
+			});
+			});
+		}catch(err) {		
+			console.log("the user id or voucher id provided was wrong ! "); 
+			response = {success:false, message:"the user id or voucher id provided was wrong ! " }
+			callback(err, response);			
+		}
+});	
+},
+"deleteUserById" : function(userId, callback){
+var response;
+ User.remove({
+    _id: userId
+    }, function(err, user) {
+    if (err){callback(err, response);}
+    response = { success:true, message: 'User: '+ user+' Successfully deleted' };
+    callback(response);
+});	
+},
 "updateUserVoucherById": function(userId, voucherId, callback){
 var response;
 Matrix.findOne({
@@ -37,8 +85,7 @@ Matrix.findOne({
 		callback(err, response);
 		
 	}
-});
-	
+});	
 },
 "updateUserById" : function(body, userId, callback){
 var response;
