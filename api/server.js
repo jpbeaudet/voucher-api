@@ -176,6 +176,15 @@ router.route('/users/:users_id/circles/third')
 	api.getUserThirdCircle(req.params.users_id, _cb);		
 });
 
+router.route('/users/:users_id/circles/myVoucher')
+//get the user myVoucher(accessed at GET http://localhost:4006/api/users/:users_id/circles/myVoucher')
+.get(function(req, res) {
+	var _cb = function(err, matrix){ 
+	console.log('User myVoucher returned successfully ');
+	if(err){res.send(err);}else{res.json(matrix);}		  
+	};	
+	api.getUserMyVoucher(req.params.users_id, _cb);		
+});
 /////////////////////////////////////////
 //Update section
 

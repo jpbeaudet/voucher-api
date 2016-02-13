@@ -153,6 +153,16 @@ User.findById(userId, function(err, user) {
         });
 });	
 },
+"getUserMyVoucher" : function(userId, callback){
+var response;
+Matrix.findOne({
+	user_id: userId
+	}, function(err, matrix) {
+	if (err) callback(err,response);
+	response = matrix.circles.my_voucher;
+	callback(response);
+});
+},	
 "getUserThirdCircle" : function(userId, callback){
 var response;
 Matrix.findOne({
