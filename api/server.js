@@ -210,7 +210,7 @@ router.route('/users/:users_id/circles/:voucher_id')
 		user_id: req.params.users_id
 		
 		}, function(err, matrix) {
-			console.log("put did find "+matrix);
+			//console.log("put did find "+matrix);
 			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
 			var arr = [];
 			var arr_before = matrix.circles.first_circle.voucher
@@ -218,9 +218,9 @@ router.route('/users/:users_id/circles/:voucher_id')
 				arr.push(arr_before[i]);
 			}			
 			//arr.push(matrix.circles.first_circle.voucher);
-			console.log("put arr[0]  "+arr[0]);
+			//console.log("put arr[0]  "+arr[0]);
 			arr.push(req.params.voucher_id);
-			console.log("put arr[1]  "+arr[1]);
+			//console.log("put arr[1]  "+arr[1]);
 			matrix.circles.first_circle.voucher = undefined;
 			matrix.save(function(err) {			
 				//console.log("put arr"+arr);			
@@ -253,13 +253,13 @@ router.route('/users/:users_id')
 
 router.route('/users/:users_id/circles/:voucher_id')
 .delete(function(req, res) {
-	console.log("delete did fired !!! ");
+	//console.log("delete did fired !!! ");
 	var massage="No messages. id was : ";
 	Matrix.findOne({
 		user_id: req.params.users_id
 		
 		}, function(err, matrix) {
-			console.log("delete did find "+matrix);
+			//console.log("delete did find "+matrix);
 			//console.log("put did find matrix.circles.first_circle.voucher "+matrix.circles.first_circle.voucher);
 			var arr = [];
 			//arr.push(matrix.circles.first_circle.voucher);
@@ -269,11 +269,11 @@ router.route('/users/:users_id/circles/:voucher_id')
 			}	
 			matrix.circles.first_circle.voucher = undefined;
 			matrix.save(function(err) {			
-				console.log("delete arr before "+arr);
-				console.log("delete req.params.voucher_id "+req.params.voucher_id);	
+				//console.log("delete arr before "+arr);
+				//console.log("delete req.params.voucher_id "+req.params.voucher_id);	
 				var index = arr.indexOf(req.params.voucher_id);
-				console.log("delete arr "+arr);
-				console.log("delete arr index "+index);
+				//console.log("delete arr "+arr);
+				//console.log("delete arr index "+index);
 				if(index != null && index != undefined){ 
 				
 				arr.splice(index, 1);
@@ -284,7 +284,7 @@ router.route('/users/:users_id/circles/:voucher_id')
 				message = "Voucher did not exist :";
 				}
 				matrix.save(function(err) {
-					console.log("delete arr after "+arr);
+					//console.log("delete arr after "+arr);
 					if (err)
 						res.send(err);
 	           
