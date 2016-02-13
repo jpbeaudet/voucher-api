@@ -5,10 +5,52 @@ var mongoose   = require('mongoose');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var bodyParser = require('body-parser');
 var morgan      = require('morgan');
-var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 
 module.exports= {
+"refreshVouchersById" : function(userId, callback){
+	var response;
+	var newVoucher = [];
+	// Loop through all documents to find new voucher to update
+	Matrix.find(function(err, documents) {
+		if (err){callback(err, response);}
+		//console.log("Documents : "+documents);
+		var arr = [];
+		// in all documents founds loop througth there first circle voucher
+		for (x in documents){
+			if (documents[x].user_id != userId){ 
+			//console.log("Document : "+documents[x]);
+			if(documents[x].circles.first_circle.voucher[0]){
+				//console.log("Document array : "+documents[x].circles.first_circle.voucher[0]+" is type of : "+ typeof(documents[x].circles.first_circle.voucher));
+				// in the first circle voucher loop to see if the userId is mentioned if so ass to newVoucher
+				for (i = 0; i < documents[x].circles.first_circle.voucher.length; i++) { 
+					console.log("documents[x].circles.first_circle.voucher[i]: "+documents[x].circles.first_circle.voucher[i]);
+					if(documents[x].circles.first_circle.voucher[i] == userId ){ 
+				console.log("New voucher for: "+userId+" from: "+documents[x].user_id);				
+				newVoucher.push(documents[x].user_id);
+					}
+			}}}
+		}
+	// if there is new voucher to update
+	if (newVoucher[0]){
+		Matrix.findOne({
+			user_id : userId
+		},function(err, user) {		
+		user.circles.my_voucher = newVoucher;
+		user.save(function(err, _id) {
+			if (err){callback(err, response);}
+			response = { success:true , message: "user myVoucher circle successfully updated", myVoucher: _id};
+			callback(response);
+			});
+
+		});	
+	}else{
+		console.log(" No new voucher to update for: " + userId); 
+		response = {success:false, message:" No new voucher to update for: " + userId};
+		callback(response);
+	}		
+});		
+},
 "deleteUserVoucherById" : function(userId,voucherId, callback){
 var response;
 var message="No messages. id was : ";
@@ -67,11 +109,14 @@ Matrix.findOne({
 	var arr = [];
 	try {
 	var arr_before = matrix.circles.first_circle.voucher;
+	console.log("arr_before: "+arr_before);
 	for (i = 0; i < arr_before.length; i++) { 
 		arr.push(arr_before[i]);
 		}
+	arr.push(voucherId)
 	matrix.circles.first_circle.voucher = undefined;	
-	matrix.save(function(err) {						
+	matrix.save(function(err) {	
+		console.log("arr_after: "+arr);
 		matrix.circles.first_circle.voucher = arr;		
 		matrix.save(function(err) {
 		if (err){callback(err,response);}

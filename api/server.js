@@ -58,9 +58,9 @@ router.post('/setup', function(req, res) {
 router.post('/authenticate', function(req, res) {
 	var secret;
 	if(req.body.admin){ secret = app.get('superSecret_admin');}else{secret = app.get('superSecret_client');}
-	
+
 	var _cb = function(response){
-	//console.log("response recieved by server.js " + JSON.stringify(response));
+	console.log("response recieved by server.js " + JSON.stringify(response));
 	console.log("User authenticated successfully: " +req.body.name);
 	res.json(response);
 	};
@@ -96,6 +96,17 @@ router.use(function(req, res, next) {
 });
 
 // While authenticated:
+/////////////////////////////////////////
+router.route('/myVoucher/:users_id') 
+//refresh and thnen get the user updated data (accessed at GET http://localhost:4006/api/myVoucher/:user_id)
+.get(function(req, res) {
+	var _cb = function(user){
+		console.log("User document updated: " + JSON.stringify(user));
+		res.json(user);
+		};	
+		api.refreshVouchersById(req.params.users_id, _cb);
+});
+
 /////////////////////////////////////////
 // Read section
 
