@@ -56,46 +56,44 @@ router.post('/setup', function(req, res) {
 //Authenticate section
 
 router.post('/authenticate', function(req, res) {
-	//console.log("authenticate server.js body: "+JSON.stringify(req.body));
-	//console.log("authenticate server.js name: "+req.body.name);
-	//console.log("authenticate server.js password: "+req.body.password);
-	//console.log("authenticate server.js admin: "+req.body.admin);
 	var secret;
 	if(req.body.admin){ secret = app.get('superSecret_admin');}else{secret = app.get('superSecret_client');}
 	
 	var _cb = function(response){
 	//console.log("response recieved by server.js " + JSON.stringify(response));
+	console.log("User authenticated successfully: " +req.body.name);
 	res.json(response);
 	};
 	api.authenticateUser(req.body, secret, _cb);
 	});
 
+////////////////////////////////////////////////////////
 //middleware to use for all requests while authenticated
-router.use(function(req, res, next) {
-	  // check header or url parameters or post parameters for token
-	  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-	  // decode token
-	  if (token) {
-	    // verifies secret and checks exp
-	    jwt.verify(token, app.get('superSecret_client'), function(err, decoded) {      
-	      if (err) {
-	        return res.json({ success: false, message: 'Failed to authenticate token.' });    
-	      } else {
-	        // if everything is good, save to request for use in other routes
-	        req.decoded = decoded;    
-	        next();
-	      }
-	    });
-	  } else {
 
-	    // if there is no token
-	    // return an error
-	    return res.status(403).send({ 
+router.use(function(req, res, next) {
+	// check header or url parameters or post parameters for token
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+	// decode token
+	if (token) {
+		// verifies secret and checks exp
+	    jwt.verify(token, app.get('superSecret_client'), function(err, decoded) {      
+	    if (err) {
+	    return res.json({ success: false, message: 'Failed to authenticate token.' });    
+	    } else {
+	    // if everything is good, save to request for use in other routes
+	    req.decoded = decoded;    
+	    next();
+	    }
+	 });
+	 } else {
+		// if there is no token
+		// return an error
+		return res.status(403).send({ 
 	        success: false, 
 	        message: 'No token provided.' 
 	    });	    
-	  }
-	});
+	    }
+});
 
 // While authenticated:
 /////////////////////////////////////////
