@@ -8,6 +8,24 @@ var morgan      = require('morgan');
 var config = require('./config'); // get our config file
 
 module.exports= {
+"isAuthenticated" : function (token, secret, callback){
+
+	// decode token
+	if (token) {
+		// verifies secret and checks exp
+	    jwt.verify(token, secret, function(err, decoded) {      
+	    if (err) {
+	    callback("error");    
+	    } else {
+	    callback("success", decoded);
+	    }
+	 });
+	 } else {
+		// if there is no token
+		// return an error
+		 callback("null");	    
+	    }	
+},
 "refreshVouchersById" : function(userId, callback){
 	var response;
 	var newVoucher = [];

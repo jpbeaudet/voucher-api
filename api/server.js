@@ -70,29 +70,31 @@ router.post('/authenticate', function(req, res) {
 ////////////////////////////////////////////////////////
 //middleware to use for all requests while authenticated
 
-router.use(function(req, res, next) {
+router.use(function(req, res, next) {	
 	// check header or url parameters or post parameters for token
 	var token = req.body.token || req.query.token || req.headers['x-access-token'];
-	// decode token
-	if (token) {
-		// verifies secret and checks exp
-	    jwt.verify(token, app.get('superSecret_client'), function(err, decoded) {      
-	    if (err) {
-	    return res.json({ success: false, message: 'Failed to authenticate token.' });    
-	    } else {
-	    // if everything is good, save to request for use in other routes
-	    req.decoded = decoded;    
-	    next();
-	    }
-	 });
-	 } else {
-		// if there is no token
-		// return an error
-		return res.status(403).send({ 
-	        success: false, 
-	        message: 'No token provided.' 
-	    });	    
-	    }
+	var _cb = function(response, decoded){
+		if (response != "null") {			
+			if(response == "error"){ 
+			console.log("User is not authenticated ");
+		    return res.json({ success: false, message: 'Failed to authenticate token.' });    
+		    } else {
+		    // if everything is good, save to request for use in other routes
+			console.log("User is authenticated ");		    	
+		    req.decoded = decoded;    
+		    next();
+		    }
+		} else if(resonse =="null"){
+			 //if there is no token
+			 //return an error
+			console.log("User token was not provided ");	
+			return res.status(403).send({ 
+		        success: false, 
+		        message: 'No token provided.' 
+		    });	    
+		    }	
+		};
+		api.isAuthenticated(token, app.get('superSecret_client'), _cb);
 });
 
 // While authenticated:
