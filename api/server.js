@@ -187,6 +187,16 @@ router.route('/users/:users_id/circles/myVoucher')
 	};	
 	api.getUserMyVoucher(req.params.users_id, _cb);		
 });
+
+router.route('/users/:name_id/getId')
+//get the user myVoucher(accessed at GET http://localhost:4006/api/users/:name_id')
+.get(function(req, res) {
+	var _cb = function( matrix){ 
+	console.log('User id returned successfully for: '+req.params.name_id+ " is : "+ JSON.stringify(matrix));	
+	res.json(matrix);		  
+	};	
+	api.getIdByName(req.params.name_id, _cb);		
+});
 /////////////////////////////////////////
 //Update section
 

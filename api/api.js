@@ -236,6 +236,16 @@ User.findById(userId, function(err, user) {
 	callback(response);
 });
 },
+"getIdByName" : function(username, callback){
+var response;
+Matrix.findOne({
+	name: username
+	}, function(err, matrix) {
+	if (err) callback(err,response);
+	response = matrix.user_id;
+	   callback(response);
+});	
+},
 "createUser" : function (body, callback){
 var d = new Date();
 var now = d.getUTCFullYear()+ "-"+d.getUTCMonth()+"-"+d.getUTCDay();
