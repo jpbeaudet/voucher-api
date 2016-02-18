@@ -84,7 +84,7 @@ router.use(function(req, res, next) {
 		    req.decoded = decoded;    
 		    next();
 		    }
-		} else if(resonse =="null"){
+		} else if(response =="null"){
 			 //if there is no token
 			 //return an error
 			console.log("User token was not provided ");	
@@ -94,7 +94,7 @@ router.use(function(req, res, next) {
 		    });	    
 		    }	
 		};
-		api.isAuthenticated(token, app.get('superSecret_client'), _cb);
+		api.isAuthenticated(token, app.get('superSecret_admin'), _cb);
 });
 
 // While authenticated:

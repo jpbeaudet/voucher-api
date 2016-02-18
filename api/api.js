@@ -9,7 +9,6 @@ var config = require('./config'); // get our config file
 
 module.exports= {
 "isAuthenticated" : function (token, secret, callback){
-
 	// decode token
 	if (token) {
 		// verifies secret and checks exp
@@ -24,7 +23,7 @@ module.exports= {
 		// if there is no token
 		// return an error
 		 callback("null");	    
-	    }	
+	 }	
 },
 "refreshVouchersById" : function(userId, callback){
 	var response;
